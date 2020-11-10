@@ -1,0 +1,16 @@
+{
+  "name": "node-red-contrib-evernote",
+  "version": "0.0.1",
+  "description": "",
+  "author": "nghoang2013@gmail.com",
+  "license": "ISC",
+  "node-red": {
+    "nodes": {
+      "evernote-credentials": "evernote.js",
+      "addNote": "addNote.js"
+    }
+  },
+  "dependencies": {
+    "evernote": "^2.0.5"
+  }
+}
