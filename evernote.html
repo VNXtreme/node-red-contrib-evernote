@@ -31,7 +31,7 @@
     </div>
     <div id="node-config-evernote-display" style="display: none;">
         <div class="form-row">
-            <label for="node-config-input-displayName"><i class="fa fa-user"></i> Display name</label>
+            <label for="node-config-input-displayName"><i class="fa fa-user"></i> Name</label>
             <input type="text" id="node-config-input-displayName">
         </div>
     </div>
@@ -53,10 +53,11 @@
             exportable: false,
             oneditprepare: function () {
                 let credentialId = this.id;
-
+                console.log('credentialId', this);
                 if(credentialId) {
-                    $("#node-config-input-display").show();
-                    $("#node-config-input-keys").hide();
+                    $("#node-config-evernote-display").show();
+                    $("#node-config-input-displayName").val(this.credentials.displayName);
+                    $("#node-config-evernote-keys").hide();
                 }
                 var callback = location.protocol + "//" +
                     location.hostname +

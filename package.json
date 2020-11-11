@@ -11,6 +11,8 @@
     }
   },
   "dependencies": {
-    "evernote": "^2.0.5"
+    "crypto": "^1.0.1",
+    "evernote": "^2.0.5",
+    "file-type": "^16.0.1"
   }
 }

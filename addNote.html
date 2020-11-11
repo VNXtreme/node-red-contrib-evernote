@@ -1,10 +1,12 @@
 <script type="text/javascript">
-    var selected1;
+    var selectedNotebook;
     RED.nodes.registerType('addNote', {
         category: 'evernote',
         color: "#C0DEED",
         defaults: {
             evernote: { type: "evernote-credentials", required: true },
+            notebooks: { value: ""},
+            title: { value: ""}
         },
         inputs: 1,
         outputs: 1,
@@ -14,17 +16,21 @@
             return this.name || "Add note";
         },
         oneditprepare: function () {
-            // $.getJSON('cal?id=' + google, function (data) {
-            //     data.forEach(function (element) {
-            //         $("#node-input-calendarId2").append('<option value=' + element + '>' + element + '</option>');
-            //         if (selected1 == element) {
-            //             $('#node-input-calendarId2 option[value="' + selected1 + '"]').prop('selected', true)
-            //         }
-            //     })
-            // })
+            let credentialId = this.id;
+            selectedNotebook = this.notebooks;
+            $.getJSON('get-notebooks?id=' + credentialId, function (notebookList) {
+                console.log('notebookList', notebookList);
+                notebookList.forEach(function (notebook) {
+                    $("#node-input-notebooks").append('<option value=' + notebook.guid + '>' + notebook.name + '</option>');
+                    
+                    if (selectedNotebook === notebook.guid) {
+                        $('#node-input-notebooks option[value="' + selectedNotebook + '"]').prop('selected', true)
+                    }
+                })
+            })
         },
         oneditsave: function () {
-            // selected1 = $("#node-input-calendarId2 option:selected").val();
+            selectedNotebook = $("#node-input-notebooks option:selected").val();
         }
     });
 </script>
@@ -33,6 +39,14 @@
     <div class="form-row">
         <label for="node-input-evernote"><i class="fa fa-user"></i> Evernote</label>
         <input type="text" id="node-input-evernote">
+    </div>
+    <div class="form-row">
+        <label for="node-input-notebooks"><i class="fa fa-book"></i> Notebooks</label>
+        <select id="node-input-notebooks" style="width: 70%"></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-title"><i class="fa fa-title"></i> Note title</label>
+        <input type="text" id="node-input-title">
     </div>
 </script>
 
