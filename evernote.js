@@ -1,5 +1,5 @@
 var Evernote = require("evernote");
-var isDev = true;
+var isDev = false;
 
 module.exports = function (RED) {
   function EvernoteNode(config) {
