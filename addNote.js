@@ -25,7 +25,7 @@ module.exports = function (RED) {
       try {
         node.status({ fill: "blue", shape: "ring", text: "Creating..." });
         let ourNote = getNote(title, convertLineBreak(content), resources, selectedNotebook);
-        // console.log(convertLineBreak(content));return;
+        
         // Attempt to create note in Evernote account
         noteStore
           .createNote(ourNote)

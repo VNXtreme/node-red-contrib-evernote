@@ -9,13 +9,8 @@ module.exports = function (RED) {
     node.on("input", function (msg) {
       if (!node.credentials || !node.credentials.accessToken) {
         node.status({ fill: "red", shape: "dot", text: "box.warn.no-credentials" });
-        // node.error(RED._("box.error.no-filename-specified"));
         return;
       }
-
-      // msg.payload = msg.payload.toLowerCase();
-      // // console.log("this.credentials", this.credentials);
-      // node.send(msg);
     });
   }
   RED.nodes.registerType("evernote-credentials", EvernoteNode, {
@@ -45,14 +40,10 @@ module.exports = function (RED) {
 
     client.getRequestToken(callbackUrl, function (error, oauthToken, oauthTokenSecret) {
       if (error) {
-        // do your error handling here
-        console.log("error");
         res.send(RED._("box.error.no-credentials"));
         return false;
       }
 
-      // store your token here somewhere - for this example we use req.session
-      // req.session.oauthToken = oauthToken;
       var credentials = RED.nodes.getCredentials(credentialId) || {};
 
       credentials.displayName = clientKey;
@@ -85,18 +76,10 @@ module.exports = function (RED) {
 
     client.getAccessToken(oauthToken, credentials.oauthTokenSecret, oauthVerifier, function (error, accessToken, oauthTokenSecret, results) {
       if (error) {
-        // do your error handling
-        console.log("error getAccessToken");
-        return res.send(RED._("evernote.error.something-broken"));
+        return res.send(RED._("evernote.error.get-access-token"));
       }
-      console.log("authenticated accessToken", accessToken);
-
-      // delete credentials.oauthToken;
-      // delete credentials.callback;
-
+      
       credentials.accessToken = accessToken;
-      console.log("credentialscredentialscredentialscredentials", credentialId, credentials);
-
       RED.nodes.addCredentials(credentialId, credentials);
       res.send(RED._("evernote.message.authorized"));
     });

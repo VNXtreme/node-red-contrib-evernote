@@ -18,11 +18,11 @@
     <div id="node-config-evernote-keys">
         <div class="form-row">
             <label for="node-config-input-clientKey"><i class="fa fa-user"></i> Consumer key</label>
-            <input type="text" id="node-config-input-clientKey">
+            <input type="text" id="node-config-input-clientKey" placeholder="Your client key">
         </div>
         <div class="form-row">
             <label for="node-config-input-clientSecret"><i class="fa fa-key"></i> Consumer secret</label>
-            <input type="password" id="node-config-input-clientSecret">
+            <input type="password" id="node-config-input-clientSecret" placeholder="Your client secret">
         </div>
         <div class="form-row">
             <label>&nbsp;</label>
@@ -54,7 +54,7 @@
             oneditprepare: function () {
                 let credentialId = this.id;
                 console.log('credentialId', this);
-                if(credentialId) {
+                if(this.credentials.clientKey) {
                     $("#node-config-evernote-display").show();
                     $("#node-config-input-displayName").val(this.credentials.displayName);
                     $("#node-config-evernote-keys").hide();
