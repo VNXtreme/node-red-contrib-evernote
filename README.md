@@ -5,10 +5,10 @@ node-red-contrib-evernote
 
 ## Installation
 
-    $npm install node-red-contrib-evernote
+    npm install node-red-contrib-evernote
 or
 
-    $ yarn add node-red-contrib-evernote
+    yarn add node-red-contrib-evernote
 
 ## Evernote Credentials
 
