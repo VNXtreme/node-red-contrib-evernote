@@ -7,7 +7,6 @@ module.exports = function (RED) {
     var node = this;
 
     node.on("input", function (msg) {
-      console.log("this", msg);
       if (!node.credentials || !node.credentials.accessToken) {
         node.status({ fill: "red", shape: "dot", text: "box.warn.no-credentials" });
         // node.error(RED._("box.error.no-filename-specified"));

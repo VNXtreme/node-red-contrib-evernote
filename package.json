@@ -1,9 +1,13 @@
 {
   "name": "node-red-contrib-evernote",
   "version": "1.0.0",
-  "description": "",
+  "description": "Create note using Evernote API",
   "author": "nghoang2013@gmail.com",
   "license": "ISC",
+  "keywords": [
+    "node-red",
+    "evernote"
+  ],
   "node-red": {
     "nodes": {
       "evernote-credentials": "evernote.js",
