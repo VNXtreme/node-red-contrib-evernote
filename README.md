@@ -22,11 +22,11 @@ Each credential defined as a Node-RED secret has the following properties:
 | **clientKey**    | `string` |
 | **clientSecret** | `string` |
 
-The credentials for a service account can be acquired from the [Evernote Developer Documentation](https://dev.evernote.com/doc/). 
+The API keys can be acquired from the [Evernote Developer Documentation](https://dev.evernote.com/doc/). 
 
 ## The Evernote Node-RED nodes
 
 The set of Node-RED nodes are found in the section of the palette.  The current set of nodes are:
 
-* Evernote - Register your credential.
-* AddNote - Add note to your notebook.
+* evernote-credentials - Register your credential.
+* addNote - Add note to your notebook.
