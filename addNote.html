@@ -5,8 +5,8 @@
         color: "#C0DEED",
         defaults: {
             evernote: { type: "evernote-credentials", required: true },
-            notebooks: { value: ""},
-            title: { value: ""}
+            notebooks: { value: "" },
+            title: { value: "" }
         },
         inputs: 1,
         outputs: 1,
@@ -22,7 +22,7 @@
                 console.log('notebookList', notebookList);
                 notebookList.forEach(function (notebook) {
                     $("#node-input-notebooks").append('<option value=' + notebook.guid + '>' + notebook.name + '</option>');
-                    
+
                     if (selectedNotebook === notebook.guid) {
                         $('#node-input-notebooks option[value="' + selectedNotebook + '"]').prop('selected', true)
                     }
@@ -51,5 +51,33 @@
 </script>
 
 <script type="text/html" data-help-name="addNote">
-    <p>Send a message every time an event occurs in a <a href="https://www.google.com/calendar">Google Calendar</a>.</p>
+    <p>Create note to <a href="https://evernote.com/">Evernote</a>.</p>
+    <p>The incoming message can provide the following properties:</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">
+            title <span class="property-type">string</span>
+        </dt>
+        <dd>Title of your note</dd>
+    </dl>
+    <dl class="message-properties">
+        <dt class="optional">
+            payload <span class="property-type">string</span>
+        </dt>
+        <dd>Content of your note</dd>
+    </dl>
+    <dl class="message-properties">
+        <dt class="optional">
+            buffer <span class="property-type">buffer</span>
+        </dt>
+        <dd>Image buffer data</dd>
+    </dl>
+
+    <h3>Output</h3>
+    <dl class="message-properties">
+        <dt class="optional">
+            payload <span class="property-type">object</span>
+        </dt>
+        <dd>Object returned from Evernote API</dd>
+    </dl>
 </script>

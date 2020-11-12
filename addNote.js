@@ -30,7 +30,8 @@ module.exports = function (RED) {
         noteStore
           .createNote(ourNote)
           .then(function (note) {
-            node.send(note);
+            msg.payload = note;
+            node.send(msg);
             node.status({ fill: "green", shape: "dot", text: "Note created" });
           })
           .catch(function (err) {

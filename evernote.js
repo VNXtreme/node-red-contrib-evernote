@@ -40,7 +40,7 @@ module.exports = function (RED) {
 
     client.getRequestToken(callbackUrl, function (error, oauthToken, oauthTokenSecret) {
       if (error) {
-        res.send(RED._("box.error.no-credentials"));
+        res.send(RED._("evernote.error.get-request-token"));
         return false;
       }
 
@@ -78,7 +78,7 @@ module.exports = function (RED) {
       if (error) {
         return res.send(RED._("evernote.error.get-access-token"));
       }
-      
+
       credentials.accessToken = accessToken;
       RED.nodes.addCredentials(credentialId, credentials);
       res.send(RED._("evernote.message.authorized"));
