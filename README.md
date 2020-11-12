@@ -5,8 +5,9 @@ node-red-contrib-evernote
 
 ## Installation
 
-    $ npm install node-red-contrib-evernote
+    $npm install node-red-contrib-evernote
 or
+
     $ yarn add node-red-contrib-evernote
 
 ## Evernote Credentials
@@ -25,7 +26,7 @@ The credentials for a service account can be acquired from the [Evernote Develop
 
 ## The Evernote Node-RED nodes
 
-The set of Node-RED nodes are found in the GCP section of the palette.  The current set of nodes are:
+The set of Node-RED nodes are found in the section of the palette.  The current set of nodes are:
 
 * Evernote - Register your credential.
-* AddNote - Create note.
+* AddNote - Add note to your notebook.
