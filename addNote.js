@@ -15,7 +15,7 @@ module.exports = function (RED) {
     let client = new Evernote.Client({ token: credentials.accessToken });
     let noteStore = client.getNoteStore();
     let node = this;
-    
+
     node.on("input", async function (msg) {
       let selectedNotebook = n.notebooks;
       let title = msg.title || n.title || "";
@@ -23,7 +23,24 @@ module.exports = function (RED) {
       let resources = await getResources(msg.buffer);
 
       try {
-        makeNote(noteStore, title, content, resources, selectedNotebook, node);
+        node.status({ fill: "blue", shape: "ring", text: "Creating..." });
+        let ourNote = getNote(title, convertLineBreak(content), resources, selectedNotebook);
+        // console.log(convertLineBreak(content));return;
+        // Attempt to create note in Evernote account
+        noteStore
+          .createNote(ourNote)
+          .then(function (note) {
+            node.send(note);
+            node.status({ fill: "green", shape: "dot", text: "Note created" });
+          })
+          .catch(function (err) {
+            // Something was wrong with the note data
+            // See EDAMErrorCode enumeration for error code explanation
+            // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
+            console.log(err);
+            node.error(RED._("evernote.error.add-note"));
+            node.status({ fill: "red", shape: "ring", text: "evernote.error.add-note" });
+          });
       } catch (error) {
         node.error(RED._("evernote.error.get-notebook"));
         node.status({ fill: "red", shape: "ring", text: "evernote.error.get-notebook" });
@@ -46,8 +63,16 @@ module.exports = function (RED) {
     ];
   }
 
-  function makeNote(noteStore, noteTitle, noteBody, resources, parentNotebook, node) {
-    // Create note object
+  function convertLineBreak(content) {
+    return content.split("\n").map((block) => {
+      if (block === "") {
+        return `<div><br /></div>`;
+      }
+      return `<div>${block}</div>`;
+    }).join('');
+  }
+
+  function getNote(noteTitle, noteBody, resources, parentNotebook) {
     var ourNote = new Evernote.Types.Note();
 
     ourNote.title = noteTitle;
@@ -69,31 +94,15 @@ module.exports = function (RED) {
       }
     }
 
-
     nBody += "</en-note>";
     ourNote.content = nBody;
 
     // parentNotebook is optional; if omitted, default notebook is used
     if (parentNotebook) {
-      ourNote.notebookGuid  = parentNotebook;
+      ourNote.notebookGuid = parentNotebook;
     }
-console.log('ourNote', ourNote);
-    // Attempt to create note in Evernote account
-    noteStore
-      .createNote(ourNote)
-      .then(function (note) {
-        // Do something with `note`
-        node.send(note);
-        node.status({ fill: "green", shape: "ring", text: "Note created" });
-      })
-      .catch(function (err) {
-        // Something was wrong with the note data
-        // See EDAMErrorCode enumeration for error code explanation
-        // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
-        console.log(err);
-        node.error(RED._("evernote.error.add-note"));
-        node.status({ fill: "red", shape: "ring", text: "evernote.error.add-note" });
-      });
+
+    return ourNote;
   }
 
   RED.httpAdmin.get("/get-notebooks", function (req, res) {
