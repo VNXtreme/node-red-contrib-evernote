@@ -7,12 +7,12 @@ module.exports = function (RED) {
   function addNote(n) {
     RED.nodes.createNode(this, n);
     this.evernote = RED.nodes.getNode(n.evernote);
-    let { credentials } = this.evernote;
-    if (!credentials || !credentials.accessToken) {
+    
+    if (!this.evernote.credentials || !this.evernote.credentials.accessToken) {
       this.status({ fill: "red", shape: "ring", text: "evernote.warn.no-access-token" });
       return;
     }
-    let client = new Evernote.Client({ token: credentials.accessToken });
+    let client = new Evernote.Client({ token: this.evernote.credentials.accessToken });
     let noteStore = client.getNoteStore();
     let node = this;
 

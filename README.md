@@ -22,7 +22,8 @@ Each credential defined as a Node-RED secret has the following properties:
 | **clientKey**    | `string` |
 | **clientSecret** | `string` |
 
-The API keys can be acquired from the [Evernote Developer Documentation](https://dev.evernote.com/doc/). 
+The API keys can be acquired from the [Evernote Developer Documentation](https://dev.evernote.com/doc/). Once achieved, go to the [Support Resources](https://dev.evernote.com/support/) to active your API key for production. This process of activation will take 1-2 business days and you will receive an email notification.
+NOTE: these nodes only work with production API keys only.
 
 ## The Evernote Node-RED nodes
 
