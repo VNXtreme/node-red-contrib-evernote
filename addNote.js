@@ -3,123 +3,126 @@ var crypto = require("crypto");
 var fileType = require("file-type");
 
 module.exports = function (RED) {
-  "use strict";
-  function addNote(n) {
-    RED.nodes.createNode(this, n);
-    this.evernote = RED.nodes.getNode(n.evernote);
-    
-    if (!this.evernote.credentials || !this.evernote.credentials.accessToken) {
-      this.status({ fill: "red", shape: "ring", text: "evernote.warn.no-access-token" });
-      return;
-    }
-    let client = new Evernote.Client({ token: this.evernote.credentials.accessToken });
-    let noteStore = client.getNoteStore();
-    let node = this;
+	"use strict";
+	function addNote(n) {
+		RED.nodes.createNode(this, n);
+		this.evernote = RED.nodes.getNode(n.evernote);
 
-    node.on("input", async function (msg) {
-      let selectedNotebook = n.notebooks;
-      let title = msg.title || n.title || "";
-      let content = msg.payload || "";
-      let resources = await getResources(msg.buffer);
+		if (!this.evernote.credentials || !this.evernote.credentials.accessToken) {
+			this.status({ fill: "red", shape: "ring", text: "evernote.warn.no-access-token" });
+			return;
+		}
+		let client = new Evernote.Client({ token: this.evernote.credentials.accessToken });
+		let noteStore = client.getNoteStore();
+		let node = this;
 
-      try {
-        node.status({ fill: "blue", shape: "ring", text: "Creating..." });
-        let ourNote = getNote(title, convertLineBreak(content), resources, selectedNotebook);
-        
-        // Attempt to create note in Evernote account
-        noteStore
-          .createNote(ourNote)
-          .then(function (note) {
-            msg.payload = note;
-            node.send(msg);
-            node.status({ fill: "green", shape: "dot", text: "Note created" });
-          })
-          .catch(function (err) {
-            // Something was wrong with the note data
-            // See EDAMErrorCode enumeration for error code explanation
-            // http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
-            console.log(err);
-            node.error(RED._("evernote.error.add-note"));
-            node.status({ fill: "red", shape: "ring", text: "evernote.error.add-note" });
-          });
-      } catch (error) {
-        node.error(RED._("evernote.error.get-notebook"));
-        node.status({ fill: "red", shape: "ring", text: "evernote.error.get-notebook" });
-      }
-    });
-  }
-  RED.nodes.registerType("addNote", addNote);
+		node.on("input", async function (msg) {
+			let selectedNotebook = n.notebooks;
+			let title = msg.title || n.title || "";
+			let content = msg.payload || "";
+			let resources = await getResources(msg.buffer);
 
-  async function getResources(imageBuffer) {
-    if (!imageBuffer) return [];
+			try {
+				node.status({ fill: "blue", shape: "ring", text: "Creating..." });
+				let ourNote = getNote(title, convertLineBreak(content), resources, selectedNotebook);
 
-    let file = await fileType.fromBuffer(imageBuffer);
-    return [
-      {
-        mime: file.mime,
-        data: {
-          body: imageBuffer,
-        },
-      },
-    ];
-  }
+				// Attempt to create note in Evernote account
+				noteStore
+					.createNote(ourNote)
+					.then(function (note) {
+						msg.payload = note;
+						node.send(msg);
+						node.status({ fill: "green", shape: "dot", text: "Note created" });
+					})
+					.catch(function (err) {
+						// Something was wrong with the note data
+						// See EDAMErrorCode enumeration for error code explanation
+						// http://dev.evernote.com/documentation/reference/Errors.html#Enum_EDAMErrorCode
+						console.log(err);
+						node.error(RED._("evernote.error.add-note"));
+						node.status({ fill: "red", shape: "ring", text: "evernote.error.add-note" });
+					});
+			} catch (error) {
+				node.error(RED._("evernote.error.get-notebook"));
+				node.status({ fill: "red", shape: "ring", text: "evernote.error.get-notebook" });
+			}
+		});
+	}
+	RED.nodes.registerType("addNote", addNote);
 
-  function convertLineBreak(content) {
-    return content.split("\n").map((block) => {
-      if (block === "") {
-        return `<div><br /></div>`;
-      }
-      return `<div>${block}</div>`;
-    }).join('');
-  }
+	async function getResources(imageBuffer) {
+		if (!imageBuffer) return [];
 
-  function getNote(noteTitle, noteBody, resources, parentNotebook) {
-    var ourNote = new Evernote.Types.Note();
+		let file = await fileType.fromBuffer(imageBuffer);
+		return [
+			{
+				mime: file.mime,
+				data: {
+					body: imageBuffer,
+				},
+			},
+		];
+	}
 
-    ourNote.title = noteTitle;
+	function convertLineBreak(content) {
+		return content.split("\n").map((block) => {
+			if (block === "") {
+				return `<div><br /></div>`;
+			}
+			return `<div>${block}</div>`;
+		}).join('');
+	}
 
-    // Build body of note
-    var nBody = '<?xml version="1.0" encoding="UTF-8"?>';
-    nBody += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">';
-    nBody += "<en-note>" + noteBody;
+	function getNote(noteTitle, noteBody, resources, parentNotebook) {
+		var ourNote = new Evernote.Types.Note();
 
-    if (resources && resources.length > 0) {
-      // Add Resource objects to note body
-      nBody += "<br /><br />";
-      ourNote.resources = resources;
-      for (let i in resources) {
-        var md5 = crypto.createHash("md5");
-        md5.update(resources[i].data.body);
-        var hexhash = md5.digest("hex");
-        nBody += '<br /><en-media type="' + resources[i].mime + '" hash="' + hexhash + '" /><br />';
-      }
-    }
+		ourNote.title = noteTitle;
 
-    nBody += "</en-note>";
-    ourNote.content = nBody;
+		// Build body of note
+		var nBody = '<?xml version="1.0" encoding="UTF-8"?>';
+		nBody += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">';
+		nBody += "<en-note>" + noteBody;
 
-    // parentNotebook is optional; if omitted, default notebook is used
-    if (parentNotebook) {
-      ourNote.notebookGuid = parentNotebook;
-    }
+		if (resources && resources.length > 0) {
+			// Add Resource objects to note body
+			nBody += "<br /><br />";
+			ourNote.resources = resources;
+			for (let i in resources) {
+				var md5 = crypto.createHash("md5");
+				md5.update(resources[i].data.body);
+				var hexhash = md5.digest("hex");
+				nBody += '<br /><en-media type="' + resources[i].mime + '" hash="' + hexhash + '" /><br />';
+			}
+		}
 
-    return ourNote;
-  }
+		nBody += "</en-note>";
+		ourNote.content = nBody;
 
-  RED.httpAdmin.get("/get-notebooks", function (req, res) {
-    let credentialId = req.query.id;
-    let { evernote } = RED.nodes.getNode(credentialId);
-    let client = new Evernote.Client({ token: evernote.credentials.accessToken });
-    var noteStore = client.getNoteStore();
+		// parentNotebook is optional; if omitted, default notebook is used
+		if (parentNotebook) {
+			ourNote.notebookGuid = parentNotebook;
+		}
 
-    noteStore
-      .listNotebooks()
-      .then(function (notebooks) {
-        res.json(notebooks);
-      })
-      .catch((err) => {
-        node.error(RED._("evernote.error.get-notebook"));
-        node.status({ fill: "red", shape: "ring", text: "evernote.error.get-notebook" });
-      });
-  });
+		return ourNote;
+	}
+
+	RED.httpAdmin.get("/get-notebooks", function (req, res) {
+		let credentialId = req.query.id;
+		let node = RED.nodes.getNode(credentialId);
+		if (node) {
+			let { evernote } = node;
+			let client = new Evernote.Client({ token: evernote.credentials.accessToken });
+			var noteStore = client.getNoteStore();
+
+			noteStore
+				.listNotebooks()
+				.then(function (notebooks) {
+					res.json(notebooks);
+				})
+				.catch((err) => {
+					node.error(RED._("evernote.error.get-notebook"));
+					node.status({ fill: "red", shape: "ring", text: "evernote.error.get-notebook" });
+				});
+		}
+	});
 };

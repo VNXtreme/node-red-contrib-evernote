@@ -16,12 +16,19 @@
 
 <script type="text/x-red" data-template-name="evernote-credentials">
     <div id="node-config-evernote-keys">
+		<div class="form-row">
+			<label for="node-config-input-mode">API mode</label>
+			<select id="node-config-input-mode" style="width: 70%">
+				<option value="1" selected>Production</option>
+				<option value="0">Sandbox</option>
+			</select>
+		</div>
         <div class="form-row">
-            <label for="node-config-input-clientKey"><i class="fa fa-user"></i> Consumer key</label>
+            <label for="node-config-input-clientKey">Consumer key</label>
             <input type="text" id="node-config-input-clientKey" placeholder="Your client key">
         </div>
         <div class="form-row">
-            <label for="node-config-input-clientSecret"><i class="fa fa-key"></i> Consumer secret</label>
+            <label for="node-config-input-clientSecret">Consumer secret</label>
             <input type="password" id="node-config-input-clientSecret" placeholder="Your client secret">
         </div>
         <div class="form-row">
@@ -67,7 +74,8 @@
                 $("#node-config-start-auth").mousedown(function () {
                     let clientKey = $('#node-config-input-clientKey').val();
                     let clientSecret = $('#node-config-input-clientSecret').val();
-                    var url = 'evernote/auth?id=' + credentialId + '&clientKey=' + clientKey + "&clientSecret=" + clientSecret + "&callback=" + encodeURIComponent(callback);
+                    let mode = $('#node-config-input-mode').val();
+                    var url = 'evernote/auth?id=' + credentialId + '&mode=' + mode + '&clientKey=' + clientKey + "&clientSecret=" + clientSecret + "&callback=" + encodeURIComponent(callback);
 
                     $(this).attr("href", url);
                 });
